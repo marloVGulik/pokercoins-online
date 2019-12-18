@@ -1,3 +1,7 @@
-cd C:\Users\fakea\Documents\school\jaar 1\week 4\The-Game
+@echo off
+color 0a
+
+:home
 node app.js
 pause
+goto home

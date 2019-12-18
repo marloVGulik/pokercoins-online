@@ -2,6 +2,18 @@ var express = require('express');
 var app = express();
 var serv = require('http').Server(app);
 var io = require('socket.io')(serv,{});
+var sql = require('mysql');
+
+var SQLcon = sql.createConnection({
+  host: "10.102.32.78",
+  user: "pokerface",
+  password: "aScolT5N3EGXIxuI"
+});
+
+SQLcon.connect(function(err) {
+  if (err) throw err;
+  console.log("Connected!");
+});
 
 app.get("/", function(req,res) {
   res.sendFile(__dirname + '/client/The-Game.html');
