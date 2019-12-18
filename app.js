@@ -30,5 +30,7 @@ io.on('connection', function(socket){ //first joining
   socket.on('name', function(msg){
     socket["nickName"] = msg;
     console.log(`name recieved, client ${socket.id} is now named ${socket.nickName}`);
+    //retrieve balance from database assoicated with username
+    //socket.emit('balance' balance)
   });
 });
