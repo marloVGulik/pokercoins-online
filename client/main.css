@@ -1,0 +1,14 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+.main {
+    display: none;
+}
+#head {
+    padding: 20px;
+    background-color: #333333;
+    display: block;
+    height: 25px;
+    width: 100%;
+}
