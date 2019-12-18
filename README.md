@@ -1,2 +1,2 @@
-# pokercoins-online
-Online currency for your own poker game
+The-Game
+when using this code you agree to the license
