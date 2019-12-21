@@ -32,10 +32,13 @@ var allSockets = [];
 
 // Start here
 var gameBet = 0;
+var chosenPlayers = [];
 
 io.on('connection', function(socket) {
     // Socket data
     socket.loggedIn = false;
+    socket.isReady = false;
+    socket.isPlaying = false;
     socket.dbCoins = 0;
     socket.currentCoins = 0;
     socket.currentBet = 0;
@@ -57,8 +60,12 @@ io.on('connection', function(socket) {
                     socket.displayName = result[0].displayname;
                     socket.currentCoins = result[0].coins;
                     socket.dbCoins = result[0].coins;
+                    socket.isPlaying = true;
                     console.log(socket.currentCoins);
                     socket.finishLogin();
+
+                    var emitData = {coins: socket.dbCoins, displayName: socket.displayName};
+                    socket.emit('firstLogin', emitData);
                 }
             })
         } else {
@@ -77,21 +84,77 @@ io.on('connection', function(socket) {
 
     // GAME FUNCTIONALITY:
     socket.on('call', function() {
-        
+        socket.currentBet = gameBet;
     });
     socket.on('raise', function(bet) {
         if(bet > gameBet) {
+            console.log(gameBet);
             gameBet = bet;
+            io.emit("newRaise", gameBet);
         }
     });
     socket.on('fold', function() {
 
-    })
+    });
+    socket.on('readyButton', function(isPLayerReady) {
+        if(socket.isPlaying) {
+            socket.isReady = isPLayerReady;
+            var endGame = true;
+            for(var i = 0; i < allSockets.length; i++) {
+                if(!allSockets[i].isReady && allSockets[i].isPlaying) {
+                    endGame = false;
+                }
+            }
+            if(endGame) {
+                var playerArray = [];
+                for(var i = 0; i < allSockets.length; i++) {
+                    if(allSockets[i].isPlaying) {
+                        playerArray.push(allSockets[i].displayName);
+                    }
+                }
+                io.emit('finishGame', playerArray);
+            }
+        }
+    });
+    socket.on('chosePlayerName', function(playerDisplayName) {
+        var playingAmount = 0;
+        for(var i = 0; i < allSockets.length; i++) {
+            if(allSockets[i].isPlaying) playingAmount++;
+        }
+        if(socket.isPlaying) {
+            chosenPlayers.push(playerDisplayName);
+        }
+        if(chosenPlayers.length == playingAmount) newGame();
+    });
 
     allSockets.push(socket);
     console.log(`User connected: ${allSockets.length - 1}`);
 });
 
+function newGame() {
+    var chosenPlayerDataArray = [];
+    var firstRun = true;
+    chosenPlayers.forEach(function(playerName) {
+        if(firstRun) {
+            chosenPlayerDataArray.push({name: playerName, amount: 1});
+        } else {
+            var addToArray = false;
+            chosenPlayerDataArray.forEach(function(object) {
+                if(object.name == playerName) {
+                    object.amount++
+                } else {
+                    addToArray = true;
+                }
+            });
+            if(addToArray) {
+                chosenPlayerDataArray.push({name: playerName, amount: 1});
+            }
+        }
+    });
+    console.log("STARTING NEW GAME!");
+}
+
+// Login check
 setInterval(function() {
     for(var i = 0; i < allSockets.length; i++) {
         allSockets[i].finishLogin();

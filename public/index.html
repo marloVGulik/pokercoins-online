@@ -17,7 +17,7 @@
     </div>
     <div id="coins" class="col-2 box">
         <p>Coins</p>
-        <h1 id="totalCoins">Total coins: 0</h1>
+        <h1 id="totalCoins">Total PC: 0</h1>
         <ul>
             <li><p>Current bet:</p></li>
             <li><p>Your bet coins:</p></li>
@@ -26,24 +26,35 @@
             <li><p>Coins after winning:</p></li>
         </ul>
         <ul> 
-            <li><p id="currentBet"></p></li>>           
-            <li><p id="betCoins"></p></li>
-            <li><p id="totalBetCoins"></p></li>           
-            <li><p id="coinsAfter"></p></li>           
-            <li><p id="coinsAfterWin"></p></li>           
+            <li><p id="currentBet">0</p></li>
+            <li><p id="betCoins">0</p></li>
+            <li><p id="totalBetCoins">0</p></li>           
+            <li><p id="coinsAfter">0</p></li>           
+            <li><p id="coinsAfterWin">0</p></li>           
         </ul>
     </div>
     <div id="betting" class="col-2 box">
         <p>Betting</p>
-        <input value="0" type="number" id="bet" class="col-12 numInput">
-        <input value="Call" type="button" onclick="call()" class="col-4 buttons"><!--
-        --><input value="Raise" type="button" onclick="raise()" class="col-4 buttons"><!--
-        --><input value="Fold" type="button" onclick="fold()" class="col-4 buttons">
+        <input id="readyButton" value="READY" type="button" onclick="readyBet()" class="col-12 largeButton"><!--
+        --><input value="Increase 1" type="button" onclick="changeBet(1)" class="col-4 triple buttons"><!--
+        --><input value="Increase 10" type="button" onclick="changeBet(10)" class="col-4 triple buttons"><!--
+        --><input value="Increase 50" type="button" onclick="changeBet(50)" class="col-4 triple buttons"><!--
+        --><input value="Decrease 1" type="button" onclick="changeBet(-1)" class="col-4 triple buttons"><!--
+        --><input value="Decrease 10" type="button" onclick="changeBet(-10)" class="col-4 triple buttons"><!--
+        --><input value="Decrease 50" type="button" onclick="changeBet(-50)" class="col-4 triple buttons"><!--
+        --><input value="Call" type="button" onclick="callBet()" class="col-4 buttons"><!--
+        --><input value="Raise" type="button" onclick="raiseBet()" class="col-4 buttons"><!--
+        --><input value="Fold" type="button" onclick="foldBet()" class="col-4 buttons">
+    </div>
+    <div id="playerSelection" class="col-2 box isHidden">
+        <p>Winning player selection</p>
+        <ul id="playerList"></ul>
     </div>
 
-    <div id="bottomBar">
+    <div id="bottomBar" class="col-2 box">
+        <p>Props</p>
         Designed by: Marlo van Gulik, with help from Jorijn.
     </div>
-    <script src="./data/JS/main.js"></script>
+    <script src="./data/JS/include.js"></script>
 </body>
 </html>

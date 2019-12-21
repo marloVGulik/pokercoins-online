@@ -65,6 +65,47 @@ h1, p {
     border: 1px solid #b7e117;
     box-shadow: 0 0 10px #b7e117;
 }
+.largeButton {
+    background-color: #00000000;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    border: 1px solid #555555;
+    box-shadow: none;
+    font-size: 25px;
+    padding: 0.3em;
+    margin: 0.1em 0;
+    transition: cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.2s;
+}
+.largeButton:hover {
+    border: 1px solid #21b3d2;
+    box-shadow: 0 0 3px #21b3d2;
+}
+.largeButton:active {
+    border: 1px solid #b7e117;
+    box-shadow: 0 0 10px #b7e117;
+}
+
+
+#coins>ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+}
+#bet {
+    background-color: #000000;
+    color: #FFFFFF;
+}
+
+#playerList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
 
 /* For desktop: */
 .col-1 {width: 8.33%;}
@@ -85,4 +126,10 @@ h1, p {
   [class*="col-"] {
     width: 100%;
   }
+  [class*="triple"] {
+    width: 33.33%;
+  }
+}
+.isHidden {
+    display: none;
 }
