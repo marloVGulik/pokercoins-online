@@ -1,2 +1,3 @@
-The-Game
-when using this code you agree to the license
+PokerCoins online
+
+If you want to use the code, you automatically agree to the license

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./data/CSS/main.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <title>YAH</title>
+</head>
+<body>
+    <div id="loginForm" class="col-2 box">
+        <p>Login</p>
+        <input id="username" type="text" class="col-12 buttons">
+        <input id="password" type="password" class="col-12 buttons">
+        <input type="button" onclick="login()" id="loginButton" class="col-12 buttons" value="LOGIN"></button>
+    </div>
+    <div id="coins" class="col-2 box">
+        <p>Coins</p>
+        <h1 id="totalCoins">Total coins: </h1>
+        <p id="betCoins"></p>
+        <p id="coinsAfter"></p>
+    </div>
+    <div id="betting" class="col-2 box">
+        <input value="0" type="number" id="bet">
+        <input value="Submit bet" type="button" onclick="game.submitBet()">
+    </div>
+
+    <div id="bottomBar">
+        Designed by: Marlo van Gulik, with help from Jorijn.
+    </div>
+    <script src="./data/JS/main.js"></script>
+</body>
+</html>
