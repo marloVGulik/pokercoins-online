@@ -53,7 +53,7 @@ var game = {
     updateBet: function(data) {
         document.getElementById("totalCoins").innerHTML = `Total coins: ${data.totalCoins}`;
         document.getElementById("betCoins").innerHTML = `Your bet coins: ${data.betCoins}`;
-        document.getElementById("totalBetCoins").innerHTML = `The total amount of coins in the bet: ${data.totalBetCoins}`;
+        document.getElementById("totalBetCoins").innerHTML = `Total coins in bet: ${data.totalBetCoins}`;
         document.getElementById("coinsAfter").innerHTML = `Coins after losing: ${data.coinsAfter}`;
         document.getElementById("coinsAfterWin").innerHTML = `Coins after winning: ${data.coinsAfterWinning}`;
     },
@@ -61,4 +61,12 @@ var game = {
 
     }
 }
-game.update();
+
+document.getElementById("bet").addEventListener('input', function(evt) {
+    if(document.getElementById("bet").value >= game.gameBet) {
+        game.currentBet = document.getElementById("bet").value;
+        document.getElementById("currentBet").innerHTML = `Current bet: ${game.currentBet}`;
+    }
+    document.getElementById("bet").value = game.currentBet;
+});
+document.getElementById("bet").value = 0;

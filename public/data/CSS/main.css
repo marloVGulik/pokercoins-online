@@ -33,6 +33,11 @@ h1, p {
     border-bottom: 1px solid #555555;
     text-align: left;
 }
+.numInput {
+    box-sizing: border-box;
+    display: block;
+    border: 1px solid #555555;
+}
 
 
 #loginForm {

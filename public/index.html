@@ -17,15 +17,25 @@
     </div>
     <div id="coins" class="col-2 box">
         <p>Coins</p>
-        <h1 id="totalCoins">Total coins: </h1>
-        <p id="betCoins"></p>
-        <p id="totalBetCoins"></p>
-        <p id="coinsAfter"></p>
-        <p id="coinsAfterWin"></p>
+        <h1 id="totalCoins">Total coins: 0</h1>
+        <ul>
+            <li><p>Current bet:</p></li>
+            <li><p>Your bet coins:</p></li>
+            <li><p>Total coins in bet:</p</li>
+            <li><p>Coins after losing:</p></li>
+            <li><p>Coins after winning:</p></li>
+        </ul>
+        <ul> 
+            <li><p id="currentBet"></p></li>>           
+            <li><p id="betCoins"></p></li>
+            <li><p id="totalBetCoins"></p></li>           
+            <li><p id="coinsAfter"></p></li>           
+            <li><p id="coinsAfterWin"></p></li>           
+        </ul>
     </div>
     <div id="betting" class="col-2 box">
         <p>Betting</p>
-        <input value="12" type="number" id="bet" class="col-12">
+        <input value="0" type="number" id="bet" class="col-12 numInput">
         <input value="Call" type="button" onclick="call()" class="col-4 buttons"><!--
         --><input value="Raise" type="button" onclick="raise()" class="col-4 buttons"><!--
         --><input value="Fold" type="button" onclick="fold()" class="col-4 buttons">
