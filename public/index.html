@@ -19,11 +19,16 @@
         <p>Coins</p>
         <h1 id="totalCoins">Total coins: </h1>
         <p id="betCoins"></p>
+        <p id="totalBetCoins"></p>
         <p id="coinsAfter"></p>
+        <p id="coinsAfterWin"></p>
     </div>
     <div id="betting" class="col-2 box">
-        <input value="0" type="number" id="bet">
-        <input value="Submit bet" type="button" onclick="game.submitBet()">
+        <p>Betting</p>
+        <input value="12" type="number" id="bet" class="col-12">
+        <input value="Call" type="button" onclick="call()" class="col-4 buttons"><!--
+        --><input value="Raise" type="button" onclick="raise()" class="col-4 buttons"><!--
+        --><input value="Fold" type="button" onclick="fold()" class="col-4 buttons">
     </div>
 
     <div id="bottomBar">

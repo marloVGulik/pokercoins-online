@@ -15,6 +15,10 @@ socket.on('checkLogin', function(isLoggedIn) {
         hideThis(true);
     }
 });
+socket.on('updateBet', function(data) {
+    game.updateBet(data);
+})
+
 function login() {
     if(!loggedIn) {
         var data = {
@@ -46,7 +50,15 @@ var game = {
             socket.emit('bet', bet);
         }
     },
+    updateBet: function(data) {
+        document.getElementById("totalCoins").innerHTML = `Total coins: ${data.totalCoins}`;
+        document.getElementById("betCoins").innerHTML = `Your bet coins: ${data.betCoins}`;
+        document.getElementById("totalBetCoins").innerHTML = `The total amount of coins in the bet: ${data.totalBetCoins}`;
+        document.getElementById("coinsAfter").innerHTML = `Coins after losing: ${data.coinsAfter}`;
+        document.getElementById("coinsAfterWin").innerHTML = `Coins after winning: ${data.coinsAfterWinning}`;
+    },
     init: function() {
 
     }
 }
+game.update();

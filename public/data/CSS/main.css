@@ -52,12 +52,13 @@ h1, p {
     border: 1px solid #21b3d2;
     box-shadow: 0 0 3px #21b3d2;
 }
-.buttons:active {
-    box-shadow: 0 0 15px #21b3d2;
-}
 .buttons:focus {
     border: 1px solid #21b3d2;
     box-shadow: 0 0 5px #21b3d2;
+}
+.buttons:active {
+    border: 1px solid #b7e117;
+    box-shadow: 0 0 10px #b7e117;
 }
 
 /* For desktop: */

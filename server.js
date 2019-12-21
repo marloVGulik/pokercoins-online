@@ -6,7 +6,7 @@ const socket = require('socket.io');
 
 // SQL
 var SQLCon = sql.createConnection({
-    host: "127.0.0.1",
+    host: "192.168.0.104",
     user: "pokerface",
     password: "maLDgGriKadrkyrh",
     database: "poker"
@@ -36,6 +36,7 @@ var gameBet = 0;
 io.on('connection', function(socket) {
     // Socket data
     socket.loggedIn = false;
+    socket.dbCoins = 0;
     socket.currentCoins = 0;
     socket.currentBet = 0;
     socket.displayName = "";
@@ -55,6 +56,7 @@ io.on('connection', function(socket) {
                     socket.name = result[0].username;
                     socket.displayName = result[0].displayname;
                     socket.currentCoins = result[0].coins;
+                    socket.dbCoins = result[0].coins;
                     console.log(socket.currentCoins);
                     socket.finishLogin();
                 }
@@ -72,10 +74,18 @@ io.on('connection', function(socket) {
             }
         }
     });
-    socket.on('bet', function(bet) {
-        if(bet >= gameBet) {
+
+    // GAME FUNCTIONALITY:
+    socket.on('call', function() {
+        
+    });
+    socket.on('raise', function(bet) {
+        if(bet > gameBet) {
             gameBet = bet;
         }
+    });
+    socket.on('fold', function() {
+
     })
 
     allSockets.push(socket);
