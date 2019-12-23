@@ -1,8 +1,9 @@
 const hostname = '127.0.0.1';
 const port = '25565';
 const sql = require('mysql');
+const fs = require('fs');
 const express = require('express');
-const socket = require('socket.io');
+const sockets = require('socket.io');
 
 // SQL
 var SQLCon = sql.createConnection({
@@ -26,13 +27,84 @@ const server = app.listen(port, function() {
 });
 app.use(express.static('public'));
 
-const io = socket(server);
+const io = sockets(server);
 var allSockets = [];
 
 
 // Start here
 var gameBet = 0;
+var round = 0;
 var chosenPlayers = [];
+var playingPlayers = [];
+var playingAmount = 0;
+var gameStarted = false;
+
+function startGame() {
+    var notReadyAmount = allSockets.length;
+    for(var i = 0; i < allSockets.length; i++) {
+        if(allSockets[i].isReady) {
+            notReadyAmount--;
+        }
+    }
+    if(notReadyAmount == 0) {
+        console.log("STARTING GAME!");
+        gameBet = 0;
+        playingPlayers = [];
+        playingAmount = allSockets.length;
+        allSockets.forEach(function(socket) {
+            socket.currentBet = 0;
+            socket.isPlaying = true;
+            socket.isReady = false;
+            playingPlayers.push(socket.displayName);
+            socket.emit('gameStart');
+            socket.emit('newRound');
+        });
+    }
+    gameStarted = true;
+}
+function endGame() {
+    round = 0;
+    io.emit('finishGame', playingPlayers);
+    io.emit('newRound');
+}
+function winningPlayerChoosing() {
+    var infoArray = [];
+    var firstRun = true;
+    chosenPlayers.forEach(function(playerName) {
+        if(firstRun) {
+            infoArray.push({name: playerName, amount: 1});
+        }
+        console.log(playerName);
+    });
+}
+function newRound() {
+    var newRoundShouldHappen = true
+    allSockets.forEach(function(socket) {
+        if(!socket.isReady) {
+            newRoundShouldHappen = false;
+        }
+    });
+    if(newRoundShouldHappen) {
+        if(round == 0) {
+            startGame();
+            round++;
+        } else if(round == 4) {
+            endGame();
+            round++;
+        } else if(round == 5) {
+            winningPlayerChoosing();
+        } else if(0 < round && round < 4){
+            round++;
+            console.log("New round starting: " + round);
+            io.emit('newRound');
+            allSockets.forEach(function(socket) {
+                socket.isReady = false;
+            });
+        } else {
+            throw "Round error";
+        }
+    }
+}
 
 io.on('connection', function(socket) {
     // Socket data
@@ -48,6 +120,7 @@ io.on('connection', function(socket) {
         socket.emit('checkLogin', socket.loggedIn);
     }
 
+    // Login
     socket.on('login', function(data) {
         if(data.password.length != 0 && data.username.length != 0) {
             SQLCon.query('SELECT * FROM users WHERE username = ? AND password = ?', [data.username, data.password], function(err, result, fields) {
@@ -72,6 +145,7 @@ io.on('connection', function(socket) {
             console.log("Password length incorrect!");
         }
     });
+    // Logout or disconnect
     socket.on('disconnect', function() {
         socket.loggedIn = false;
         for(var i = 0; i < allSockets.length; i++) {
@@ -84,75 +158,41 @@ io.on('connection', function(socket) {
 
     // GAME FUNCTIONALITY:
     socket.on('call', function() {
-        socket.currentBet = gameBet;
+        if(gameStarted) {
+            socket.currentBet = gameBet;
+        }
     });
     socket.on('raise', function(bet) {
-        if(bet > gameBet) {
+        if(bet > gameBet && gameStarted) {
             console.log(gameBet);
             gameBet = bet;
             io.emit("newRaise", gameBet);
         }
     });
     socket.on('fold', function() {
-
-    });
-    socket.on('readyButton', function(isPLayerReady) {
-        if(socket.isPlaying) {
-            socket.isReady = isPLayerReady;
-            var endGame = true;
-            for(var i = 0; i < allSockets.length; i++) {
-                if(!allSockets[i].isReady && allSockets[i].isPlaying) {
-                    endGame = false;
-                }
-            }
-            if(endGame) {
-                var playerArray = [];
-                for(var i = 0; i < allSockets.length; i++) {
-                    if(allSockets[i].isPlaying) {
-                        playerArray.push(allSockets[i].displayName);
-                    }
-                }
-                io.emit('finishGame', playerArray);
-            }
+        if(gameStarted) {
+            playingAmount--;
+            socket.isPlaying = false;
         }
     });
+    socket.on('readyButton', function(isPLayerReady) {
+        socket.isReady = isPLayerReady;
+        newRound();
+    });
     socket.on('chosePlayerName', function(playerDisplayName) {
-        var playingAmount = 0;
+        console.log(playerDisplayName);
+        playingAmount = 0;
         for(var i = 0; i < allSockets.length; i++) {
             if(allSockets[i].isPlaying) playingAmount++;
         }
         if(socket.isPlaying) {
             chosenPlayers.push(playerDisplayName);
         }
-        if(chosenPlayers.length == playingAmount) newGame();
     });
 
     allSockets.push(socket);
     console.log(`User connected: ${allSockets.length - 1}`);
 });
-
-function newGame() {
-    var chosenPlayerDataArray = [];
-    var firstRun = true;
-    chosenPlayers.forEach(function(playerName) {
-        if(firstRun) {
-            chosenPlayerDataArray.push({name: playerName, amount: 1});
-        } else {
-            var addToArray = false;
-            chosenPlayerDataArray.forEach(function(object) {
-                if(object.name == playerName) {
-                    object.amount++
-                } else {
-                    addToArray = true;
-                }
-            });
-            if(addToArray) {
-                chosenPlayerDataArray.push({name: playerName, amount: 1});
-            }
-        }
-    });
-    console.log("STARTING NEW GAME!");
-}
 
 // Login check
 setInterval(function() {

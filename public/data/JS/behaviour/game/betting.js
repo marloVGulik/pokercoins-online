@@ -1,5 +1,5 @@
 function changeBet(amount) {
-    if(0 < game.currentBet + amount && game.currentBet + amount < game.coins) {
+    if(0 <= game.currentBet + amount && game.currentBet + amount <= game.coins) {
         game.currentBet += amount;
     }
     document.getElementById("currentBet").innerHTML = game.currentBet + " PC";
@@ -7,16 +7,22 @@ function changeBet(amount) {
 function submitBet() {
 }
 function callBet() {
-    game.currentBet = game.gameBet;
-    socket.emit('call');
+    if(game.gameStarted) {
+        game.currentBet = game.gameBet;
+        document.getElementById("currentBet").innerHTML = game.currentBet + " PC";
+        socket.emit('call');
+    }
 }
 function raiseBet() {
-    if(game.currentBet >= game.gameBet && game.currentBet <= game.coins) {
+    if(game.currentBet >= game.gameBet && game.currentBet <= game.coins && game.gameStarted) {
         socket.emit('raise', game.currentBet);
     }
 }
 function foldBet() {
-    isPlaying = false;
+    if(game.gameStarted) {
+        isPlaying = false;
+        socket.emit('fold');
+    }
 }
 function readyBet() {
     var button = document.getElementById("readyButton");
@@ -46,11 +52,12 @@ socket.on('newRaise', function(totalBet) {
 socket.on('finishGame', function(playerArray) {
     if(game.isPlaying) {
         for(var i = 0; i < playerArray.length; i++) {
+            console.log(playerArray[i]);
             var element = document.createElement("li");
-            var buttonElement = document.createElement("input");
-            buttonElement.onclick = `choosePlayer(${playerArray[i]})`
-            buttonElement.value = playerArray[i];
-            buttonElement.type = "button";
+            var buttonElement = document.createElement("button");
+            buttonElement.onclick = function(){choosePlayer(this.id)};
+            buttonElement.id = playerArray[i];
+            buttonElement.innerHTML = playerArray[i];
             buttonElement.classList.add("col-12");
             buttonElement.classList.add("buttons");
             element.appendChild(buttonElement);
@@ -60,6 +67,13 @@ socket.on('finishGame', function(playerArray) {
     }
 });
 function choosePlayer(playerName) {
+    console.log(playerName);
     document.getElementById("playerSelection").classList.add("isHidden");
     socket.emit('chosePlayerName', playerName);
 }
+socket.on('newRound', function() {
+    var button = document.getElementById("readyButton");
+    button.style.borderColor = "#FF0000";
+    button.style.color = "#FF0000";
+    game.isReady = false;
+});

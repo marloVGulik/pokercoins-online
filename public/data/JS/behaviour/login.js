@@ -34,4 +34,8 @@ socket.on('firstLogin', function(data) {
     document.getElementById('totalCoins').innerHTML = `Total PC: ${data.coins}`;
     game.coins = data.coins;
     hideThis(false);
+});
+socket.on('gameStart', function() {
+    game.isPlaying = true;
+    game.gameStarted = true;
 })

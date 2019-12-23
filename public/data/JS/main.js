@@ -7,6 +7,8 @@ var boxes = document.getElementsByClassName('box');
 var game = {
     isReady: false,
     isPlaying: false,
+    gameStarted: false,
+    playerAmount: 0,
     coins: 0,
     currentBet: 0,
     gameBet: 0,
