@@ -23,11 +23,28 @@ socket.on('checkLogin', function(isLoggedIn) {
         loggedIn = true;
         game.isPlaying = true;
         loginButton.value = `YOU'RE LOGGED IN!`;
+        for(var i = 0; i < document.getElementsByClassName("hideNoLogin").length; i++) {
+            if(document.getElementsByClassName("hideNoLogin")[i].classList.contains("isHidden")) {
+                document.getElementsByClassName("hideNoLogin")[i].classList.remove("isHidden");
+            }
+        }
+        if(!isPlaying) {
+            for(var i = 0; i < document.getElementsByClassName("hideNoLogin").length; i++) {
+                if(!document.getElementsByClassName("hideNoLogin")[i].classList.contains("isHidden")) {
+                    document.getElementsByClassName("hideNoLogin")[i].classList.add("isHidden");
+                }
+            }
+        }
     } else {
         loggedIn = false;
         game.isPlaying = false;
         loginButton.value = 'LOGIN';
         hideThis(true);
+        for(var i = 0; i < document.getElementsByClassName("hideNoLogin").length; i++) {
+            if(!document.getElementsByClassName("hideNoLogin")[i].classList.contains("isHidden")) {
+                document.getElementsByClassName("hideNoLogin")[i].classList.add("isHidden");
+            }
+        }
     }
 });
 socket.on('firstLogin', function(data) {
@@ -38,4 +55,4 @@ socket.on('firstLogin', function(data) {
 socket.on('gameStart', function() {
     game.isPlaying = true;
     game.gameStarted = true;
-})
+});

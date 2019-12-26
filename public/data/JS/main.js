@@ -1,4 +1,4 @@
-const socket = io.connect('http://127.0.0.1:25565');
+const socket = io.connect('http://84.87.159.149:25565');
 var loggedIn = false;
 var loginButton = document.getElementById('loginButton');
 var hiddenItems = document.getElementsByClassName('hideThis');
@@ -15,3 +15,7 @@ var game = {
     name: "",
     displayName: "",
 }
+socket.on('resetScreen', function() {
+    document.getElementById('totalCoins').innerHTML = `Total PC: ${data.coins}`;
+    game.playerAmount = 0;
+});

@@ -9,7 +9,7 @@
     <title>YAH</title>
 </head>
 <body>
-    <div id="loginForm" class="col-2 box">
+    <div id="loginForm" class="col-2 box hideOnLogin">
         <p>Login</p>
         <input id="username" type="text" class="col-12 buttons">
         <input id="password" type="password" class="col-12 buttons">
@@ -33,10 +33,13 @@
             <li><p id="coinsAfterWin">0</p></li>           
         </ul>
     </div>
-    <div id="betting" class="col-2 box">
+    <div id="readyUp" class="col-2 box">
+        <p>Ready up</p>
+        <input id="readyButton" value="READY" type="button" onclick="readyBet()" class="col-12 largeButton">
+    </div>
+    <div id="betting" class="col-2 box hideNoLogin">
         <p>Betting</p>
-        <input id="readyButton" value="READY" type="button" onclick="readyBet()" class="col-12 largeButton"><!--
-        --><input value="Increase 1" type="button" onclick="changeBet(1)" class="col-4 triple buttons"><!--
+        <input value="Increase 1" type="button" onclick="changeBet(1)" class="col-4 triple buttons"><!--
         --><input value="Increase 10" type="button" onclick="changeBet(10)" class="col-4 triple buttons"><!--
         --><input value="Increase 50" type="button" onclick="changeBet(50)" class="col-4 triple buttons"><!--
         --><input value="Decrease 1" type="button" onclick="changeBet(-1)" class="col-4 triple buttons"><!--

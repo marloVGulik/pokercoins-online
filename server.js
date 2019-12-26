@@ -33,6 +33,7 @@ var allSockets = [];
 
 // Start here
 var gameBet = 0;
+var totalBet = 0;
 var round = 0;
 var chosenPlayers = [];
 var playingPlayers = [];
@@ -49,33 +50,55 @@ function startGame() {
     if(notReadyAmount == 0) {
         console.log("STARTING GAME!");
         gameBet = 0;
+        totalBet = 0;
         playingPlayers = [];
         playingAmount = allSockets.length;
+        playingAmount = 0;
         allSockets.forEach(function(socket) {
+            playingAmount++;
             socket.currentBet = 0;
             socket.isPlaying = true;
             socket.isReady = false;
             playingPlayers.push(socket.displayName);
-            socket.emit('gameStart');
-            socket.emit('newRound');
         });
+        io.emit('gameStart', {amountOfPlayers: playingAmount});
+        io.emit('newRound');
     }
     gameStarted = true;
 }
 function endGame() {
-    round = 0;
     io.emit('finishGame', playingPlayers);
     io.emit('newRound');
+    allSockets.forEach(function(socket) {
+        socket.isReady = false;
+    });
 }
 function winningPlayerChoosing() {
     var infoArray = [];
-    var firstRun = true;
     chosenPlayers.forEach(function(playerName) {
-        if(firstRun) {
+        var createNewItem = true;
+        infoArray.forEach(function(data) {
+            if(data.name == playerName) {
+                createNewItem = false;
+                data.amount++;
+            }
+        });
+        if(createNewItem) {
             infoArray.push({name: playerName, amount: 1});
         }
         console.log(playerName);
     });
+    var chosenItem = {name: "", amount: 0};
+    infoArray.forEach(function(item) {
+        if(item.amount > chosenItem.amount) chosenItem = item;
+    });
+    console.log(`Players chose: ${chosenItem.name} as the winner, transferring coins and starting new round...`);
+
+    allSockets.forEach(function(socket) {
+        sentData = {coins: socket.dbCoins}
+        socket.emit('resetScreen', sentData);
+    })
+    round = 0;
 }
 function newRound() {
     var newRoundShouldHappen = true
@@ -99,7 +122,12 @@ function newRound() {
             io.emit('newRound');
             allSockets.forEach(function(socket) {
                 socket.isReady = false;
+                console.log(socket.currentBet + " " + socket.displayName);
+                console.log(socket.oldBet + " " + socket.displayName);
+                totalBet += (socket.currentBet - socket.oldBet);
+                socket.oldBet = socket.currentBet;
             });
+            console.log(totalBet);
         } else {
             throw "Round error";
         }
@@ -114,6 +142,7 @@ io.on('connection', function(socket) {
     socket.dbCoins = 0;
     socket.currentCoins = 0;
     socket.currentBet = 0;
+    socket.oldBet = 0;
     socket.displayName = "";
     socket.name = "";
     socket.finishLogin = function() {
@@ -165,6 +194,7 @@ io.on('connection', function(socket) {
     socket.on('raise', function(bet) {
         if(bet > gameBet && gameStarted) {
             console.log(gameBet);
+            socket.currentBet = bet;
             gameBet = bet;
             io.emit("newRaise", gameBet);
         }
@@ -173,6 +203,11 @@ io.on('connection', function(socket) {
         if(gameStarted) {
             playingAmount--;
             socket.isPlaying = false;
+            for(var i = 0; i < playingPlayers.length; i++) {
+                if(playingPlayers[i] == socket.displayName) {
+                    playingPlayers.splice(i, 1);
+                }
+            }
         }
     });
     socket.on('readyButton', function(isPLayerReady) {

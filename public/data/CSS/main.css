@@ -48,7 +48,7 @@ h1, p {
     color: #FFFFFF;
     border: 1px solid #555555;
     box-shadow: none;
-    padding: 0.6em 0.3em;
+    padding: 0.8em 0.3em;
     margin: 0.1em 0;
     transition: cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.2s;
 }
