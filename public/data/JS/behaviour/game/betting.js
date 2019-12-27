@@ -1,20 +1,20 @@
 function changeBet(amount) {
-    if(0 <= game.currentBet + amount && game.currentBet + amount <= game.coins) {
+    if(0 <= game.currentBet + amount && game.currentBet + amount <= game.coins && game.gameStarted && game.isPlaying) {
         game.currentBet += amount;
     }
-    document.getElementById("currentBet").innerHTML = game.currentBet + " PC";
+    document.getElementById("betCoins").innerHTML = game.currentBet + " PC";
 }
 function submitBet() {
 }
 function callBet() {
-    if(game.gameStarted) {
+    if(game.gameStarted && game.isPlaying) {
         game.currentBet = game.gameBet;
-        document.getElementById("currentBet").innerHTML = game.currentBet + " PC";
+        document.getElementById("betCoins").innerHTML = game.currentBet + " PC";
         socket.emit('call');
     }
 }
 function raiseBet() {
-    if(game.currentBet >= game.gameBet && game.currentBet <= game.coins && game.gameStarted) {
+    if(game.currentBet >= game.gameBet && game.currentBet <= game.coins && game.gameStarted && game.isPlaying) {
         socket.emit('raise', game.currentBet);
     }
 }
@@ -37,10 +37,11 @@ function readyBet() {
     }
     socket.emit('readyButton', game.isReady);
 }
-socket.on('newRaise', function(totalBet) {
+socket.on('newRaise', function(data) {
     console.log("test");
-    document.getElementById("totalBetCoins").innerHTML = totalBet + " PC";
-    game.gameBet = totalBet;
+    document.getElementById("totalBetCoins").innerHTML = data.currentGameBet + " PC";
+    game.gameBet = data.currentGameBet;
+    game.totalGameBet = data.totalGameBet;
     if(game.isPlaying) {
         if(game.gameBet != game.currentBet) {
             var button = document.getElementById("readyButton");
@@ -48,8 +49,13 @@ socket.on('newRaise', function(totalBet) {
             button.style.color = "#FF0000";
         }
     }
+    game.updateHTML();
 });
 socket.on('finishGame', function(playerArray) {
+    const deleteChildNodes = document.getElementById("playerList");
+    while(deleteChildNodes.firstChild) {
+        deleteChildNodes.removeChild(deleteChildNodes.firstChild);
+    }
     if(game.isPlaying) {
         for(var i = 0; i < playerArray.length; i++) {
             console.log(playerArray[i]);
@@ -71,9 +77,3 @@ function choosePlayer(playerName) {
     document.getElementById("playerSelection").classList.add("isHidden");
     socket.emit('chosePlayerName', playerName);
 }
-socket.on('newRound', function() {
-    var button = document.getElementById("readyButton");
-    button.style.borderColor = "#FF0000";
-    button.style.color = "#FF0000";
-    game.isReady = false;
-});

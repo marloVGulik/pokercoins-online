@@ -62,13 +62,21 @@ function startGame() {
             playingPlayers.push(socket.displayName);
         });
         io.emit('gameStart', {amountOfPlayers: playingAmount});
-        io.emit('newRound');
+        var sendData = {
+            totalGameBet: totalBet,
+        }
+        io.emit('newRound', sendData);
     }
     gameStarted = true;
 }
 function endGame() {
     io.emit('finishGame', playingPlayers);
-    io.emit('newRound');
+
+    
+    var sendData = {
+        totalGameBet: totalBet,
+    }
+    io.emit('newRound', sendData);
     allSockets.forEach(function(socket) {
         socket.isReady = false;
     });
@@ -95,16 +103,47 @@ function winningPlayerChoosing() {
     console.log(`Players chose: ${chosenItem.name} as the winner, transferring coins and starting new round...`);
 
     allSockets.forEach(function(socket) {
-        sentData = {coins: socket.dbCoins}
+        socket.dbCoins -= socket.currentBet;
+        if(socket.displayName == chosenItem.name) {
+            socket.dbCoins += totalBet;
+        }
+        SQLCon.query("UPDATE users SET coins = ? WHERE displayname = ?", [socket.dbCoins, socket.displayName], function(err, result) {
+            if(err) {
+                throw err;
+            }
+            else {
+                console.log(result);
+            }
+        });
+        console.log(`Transferred coins to ${socket.displayName}`);
+
+        socket.coins = socket.dbCoins;
+        sentData = {
+            coins: socket.dbCoins
+        };
         socket.emit('resetScreen', sentData);
-    })
+    });
+    var sendData = {
+        totalGameBet: totalBet,
+    }
+    io.emit('newRound', sendData);
     round = 0;
 }
 function newRound() {
     var newRoundShouldHappen = true
     allSockets.forEach(function(socket) {
         if(!socket.isReady) {
-            newRoundShouldHappen = false;
+            var isArrayEmpty = true;
+            playingPlayers.forEach(function(playerDName) {
+                isArrayEmpty = false;
+                if(playerDName == socket.displayName) {
+                    newRoundShouldHappen = false;
+                    console.log("Player is playing and not ready! " + playerDName);
+                }
+            });
+            if(isArrayEmpty) {
+                newRoundShouldHappen = false;
+            }
         }
     });
     if(newRoundShouldHappen) {
@@ -119,7 +158,6 @@ function newRound() {
         } else if(0 < round && round < 4){
             round++;
             console.log("New round starting: " + round);
-            io.emit('newRound');
             allSockets.forEach(function(socket) {
                 socket.isReady = false;
                 console.log(socket.currentBet + " " + socket.displayName);
@@ -128,6 +166,11 @@ function newRound() {
                 socket.oldBet = socket.currentBet;
             });
             console.log(totalBet);
+
+            var sendData = {
+                totalGameBet: totalBet,
+            }
+            io.emit('newRound', sendData);
         } else {
             throw "Round error";
         }
@@ -180,6 +223,7 @@ io.on('connection', function(socket) {
         for(var i = 0; i < allSockets.length; i++) {
             if(allSockets[i].id == socket.id) {
                 allSockets.splice(i, 1);
+                socket.isPlaying = false;
                 console.log("Removed user number " + i);
             }
         }
@@ -187,16 +231,16 @@ io.on('connection', function(socket) {
 
     // GAME FUNCTIONALITY:
     socket.on('call', function() {
-        if(gameStarted) {
+        if(gameStarted && socket.isPlaying) {
             socket.currentBet = gameBet;
         }
     });
     socket.on('raise', function(bet) {
-        if(bet > gameBet && gameStarted) {
+        if(bet > gameBet && gameStarted && socket.isPlaying) {
             console.log(gameBet);
             socket.currentBet = bet;
             gameBet = bet;
-            io.emit("newRaise", gameBet);
+            io.emit("newRaise", {currentGameBet: gameBet, totalGameBet: totalBet});
         }
     });
     socket.on('fold', function() {
@@ -205,6 +249,7 @@ io.on('connection', function(socket) {
             socket.isPlaying = false;
             for(var i = 0; i < playingPlayers.length; i++) {
                 if(playingPlayers[i] == socket.displayName) {
+                    console.log(`Player: ${playingPlayers[i]} has folded!`);
                     playingPlayers.splice(i, 1);
                 }
             }

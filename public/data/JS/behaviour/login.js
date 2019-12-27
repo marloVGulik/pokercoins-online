@@ -28,7 +28,7 @@ socket.on('checkLogin', function(isLoggedIn) {
                 document.getElementsByClassName("hideNoLogin")[i].classList.remove("isHidden");
             }
         }
-        if(!isPlaying) {
+        if(!game.isPlaying) {
             for(var i = 0; i < document.getElementsByClassName("hideNoLogin").length; i++) {
                 if(!document.getElementsByClassName("hideNoLogin")[i].classList.contains("isHidden")) {
                     document.getElementsByClassName("hideNoLogin")[i].classList.add("isHidden");
