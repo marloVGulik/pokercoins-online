@@ -1,0 +1,1 @@
+INSERT INTO `users` (`ID`, `username`, `displayname`, `password`, `coins`) VALUES (NULL, 'test', 'test', 'password', '1000');

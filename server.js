@@ -1,13 +1,12 @@
 const hostname = '127.0.0.1';
-const port = '25565';
+const port = '5500';
 const sql = require('mysql');
-const fs = require('fs');
 const express = require('express');
 const sockets = require('socket.io');
 
 // SQL
 var SQLCon = sql.createConnection({
-    host: "192.168.0.104",
+    host: "localhost",
     user: "pokerface",
     password: "maLDgGriKadrkyrh",
     database: "poker"
